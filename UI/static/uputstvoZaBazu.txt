@@ -1,0 +1,38 @@
+1. Instalirati bazu
+brew install postgresql
+
+2. Inicijalizovati (folder za DB mora biti prazan)
+initdb /Users/zeka/DB
+
+3. Pokrenuti DB server
+pg_ctl -D /Users/zeka/DB -l logfile start
+
+4. Povezati se na shell za bazu
+psql postgres
+psql testbaza
+
+5. U 'psql' shell-u kreirati novu DB
+CREATE DATABASE ime_baze;
+
+6. U 'psql' shell-u napraviti novog usera kom ce biti dodeljene privilegije
+CREATE USER ime_usera WITH PASSWORD 'sifra';
+
+7. U 'psql' shell-u dati sve privilegije useru
+GRANT ALL PRIVILEGES ON DATABASE ime_baze TO ime_usera;
+
+8. Izaci is shell-a
+\q
+
+9. U kodu podesiti konfiguraciju
+postgresql://your_username:your_password@localhost:5432/your_database_name
+
+
+Korisne komande ('psql' shell):
+\dt -> Lista svih tabela u bazi
+\d ime_tabele  -> Prikaz strukture odredjene tabele
+SELECT * FROM ime_tabele -> Vraca sve redove tabele
+\l -> Lista svih databaza 
+\c ime_baze -> Prebacivanje na drugu bazu
+
+\conninfo -> Informacije o trenutno odabranoj bazi
+\password ime_usera -> Promena sifre za prosledjenog usera

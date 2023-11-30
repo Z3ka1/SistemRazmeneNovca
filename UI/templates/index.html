@@ -93,7 +93,13 @@
     {% endif %}
 </nav>
 
+
+{% if 'user' not in session  %}
 <form action="/login" method="post">
+    {% if message %}
+        <label style="color: red;">{{ message }}</label>
+    {% endif %}
+
     <label for="email">Email:</label>
     <input type="email" id="email" name="email" required>
 
@@ -102,6 +108,7 @@
 
     <button type="submit">Uloguj se</button>
 </form>
+{% endif %}
 
 </body>
 </html>

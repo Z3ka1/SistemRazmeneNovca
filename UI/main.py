@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, json
+import requests
 
 app = Flask(__name__)
+app.secret_key = "qwersafargadfsgwabgxbvsdb"
 
 @app.route("/")
 def home():
@@ -36,9 +38,23 @@ def login():
         email = request.form['email']
         password = request.form['password']
     
-    #TODO poslati json objekat engine-u
+    #slanje JSON objekta engine-u
+    headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+    data = {'email': email, 'password': password}
 
-    #TODO obraditi ostatak u zavisnosti od uspesnosti akcije (session...)
+    requ = requests.post("http://localhost:6000/returnUser", json=data, headers=headers)
+    response = requ.json()
+
+    statusCode = requ.status_code
+    respMessage = response['message']
+
+    #U zavisnosti od odgovora sa servera odredjujemo dalje korake
+    if statusCode == 200:
+        foundUser = response['user']
+        session['user'] = foundUser
+        return render_template('index.html', message = respMessage)
+    else:
+        return render_template('index.html', message = respMessage)
 
 @app.route("/logout")
 def logout():
@@ -46,4 +62,4 @@ def logout():
     return render_template('index.html')
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port = 5000)
