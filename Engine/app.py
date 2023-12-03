@@ -66,6 +66,30 @@ def returnUser():
             return jsonify({'message' : 'Pogresna lozinka.'}), 400
     return jsonify({'message':'Korisnik nije pronadjen.'}), 400
 
+#Prima podatke za novog usera i ubacuje ga u bazu
+#register
+@app.route('/registerUser', methods=['POST'])
+def registerUser():
+    data = request.get_json()
+    recvFirstName = data['firstName']
+    recvLastName = data['lastName']
+    recvAddress = data['address']
+    recvCity =  data['city']
+    recvCountry = data['country']
+    recvPhoneNumber = data['phoneNumber']
+    recvEmail = data['email']
+    recvPassword = data['password']
+
+    checkUser = Users.query.filter_by(email = recvEmail).first()
+    if checkUser is None:
+        newUser = Users(False,recvFirstName,recvLastName,recvAddress, recvCity, recvCountry, recvPhoneNumber,
+                        recvEmail,recvPassword)
+        db.session.add(newUser)
+        db.session.commit()
+        #TODO Napraviti slanje mejla novom useru sa njegovim kredencijalima
+        return jsonify({'message': 'Novi korisnik uspesno napravljen!'}), 200
+    else:
+        return jsonify({'message': 'Email je vec u upotrebi!'}), 400
 
 if __name__ == '__main__':
     with app.app_context():

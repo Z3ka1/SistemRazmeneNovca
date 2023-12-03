@@ -83,9 +83,13 @@
         <a style="float: right;" href="#">Pregled Profila</a>
         <a style="float: right;" href="#">Pregled Racuna</a>
         <a style="float: right;" href="#">Transakcije</a>
+        
+        {% if session['user'].isAdmin %}
         <a style="float: right;" href="#">Live Praćenje Transakcija</a>
         <a style="float: right;" href="#">Verifikacija Naloga</a>
         <a style="float: right;" href="{{ url_for('registrationView') }}">Novi Korisnik</a>
+        {% endif %}
+
     {% endif %}
 
     {% if 'user' not in session %}

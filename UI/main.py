@@ -8,6 +8,7 @@ app.secret_key = "qwersafargadfsgwabgxbvsdb"
 def home():
     return render_template("index.html")
 
+#Ne potrebno?
 @app.route("/registrationView")
 def registrationView():
     return render_template("registracija.html")
@@ -26,9 +27,17 @@ def register():
         email = request.form['email']
         lozinka = request.form['password']
 
-    #TODO poslati json objekat engine-u //(POSLATI MAIL U ENGINEu)
+    #TODO (POSLATI MAIL U ENGINEu)
+    headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+    data = {'firstName':ime, 'lastName':prezime, 'address': adresa, 'city': grad, 'country': drzava,
+            'phoneNumber' : telefon, 'email': email, 'password': lozinka}
+    requ = requests.post("http://localhost:6000/registerUser", json = data, headers = headers)
+    response = requ.json()
+    statusCode = requ.status_code
+    respMessage = response['message']
 
-    #TODO obraditi ostatak u zavisnosti od uspesnosti akcije
+
+    return render_template('registracija.html', message = respMessage)
     
 @app.route("/login", methods=['POST', 'GET'])
 def login():
