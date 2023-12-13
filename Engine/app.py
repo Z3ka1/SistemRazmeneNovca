@@ -90,6 +90,43 @@ def registerUser():
         return jsonify({'message': 'Novi korisnik uspesno napravljen!'}), 200
     else:
         return jsonify({'message': 'Email je vec u upotrebi!'}), 400
+    
+#Prima nove podatke za postojeceg usera i menja bazu
+#update
+@app.route('/updateUser', methods=['POST'])
+def updateUser():
+    data = request.get_json()
+    recvFirstName = data['firstName']
+    recvLastName = data['lastName']
+    recvAddress = data['address']
+    recvCity =  data['city']
+    recvCountry = data['country']
+    recvPhoneNumber = data['phoneNumber']
+    recvEmail = data['email']
+    recvPassword = data['password']
+    recvNewPassword = data['newPassword']
+    recvOldEmail = data['oldEmail']
+
+    checkUser = Users.query.filter_by(email = recvOldEmail).first()
+    if checkUser:
+        if checkUser.password == recvPassword:
+            checkUser.firstName = recvFirstName
+            checkUser.lastName = recvLastName
+            checkUser.address = recvAddress
+            checkUser.city = recvCity
+            checkUser.country = recvCountry
+            checkUser.phoneNumber = recvPhoneNumber
+            checkUser.email = recvEmail
+            checkUser.password = recvNewPassword
+            db.session.commit()
+            userDict = checkUser.to_dict()
+            return jsonify({'user':userDict, 'message': 'Vasi podaci uspesno izmenjeni!'}), 200
+        else:
+            return jsonify({'message': 'Greska, ne ispravna lozinka'}), 400
+    else:
+        return jsonify({'message': 'Greska, izmena nije uspela'}), 404
+    
+
 
 if __name__ == '__main__':
     with app.app_context():

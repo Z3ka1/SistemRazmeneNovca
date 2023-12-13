@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banking App - Registracija</title>
+    <title>Banking App - Profil</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -96,36 +96,39 @@
         {% endif %}
     </nav>
 
-<form action="/register" method="post">
+<form action="/update" method="post">
     {% if message %}
         <label style="color: purple;">{{ message }}</label>
     {% endif %}
 
     <label for="firstName">Ime:</label>
-    <input type="text" id="firstName" name="firstName" required>
+    <input type="text" id="firstName" name="firstName" value="{{ session['user'].firstName }}" required>
 
-    <label for="lastName">Prezime:</label>
-    <input type="text" id="lastName" name="lastName" required>
+    <label for="lastName">Prezime: </label>
+    <input type="text" id="lastName" name="lastName" value="{{ session['user'].lastName }}" required>
 
     <label for="address">Adresa:</label>
-    <input type="text" id="address" name="address" required>
+    <input type="text" id="address" name="address" value="{{ session['user'].address }}" required>
 
     <label for="city">Grad:</label>
-    <input type="text" id="city" name="city" required>
+    <input type="text" id="city" name="city" value="{{ session['user'].city }}" required>
 
     <label for="country">Država:</label>
-    <input type="text" id="country" name="country" required>
+    <input type="text" id="country" name="country" value="{{ session['user'].country }}" required>
 
     <label for="phoneNumber">Broj telefona:</label>
-    <input type="tel" id="phoneNumber" name="phoneNumber" required>
+    <input type="tel" id="phoneNumber" name="phoneNumber" value="{{ session['user'].phoneNumber }}" required>
 
     <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
+    <input type="email" id="email" name="email" value="{{ session['user'].email }}" required>
 
-    <label for="password">Lozinka:</label>
+    <label for="password">Stara lozinka:</label>
     <input type="password" id="password" name="password" required>
 
-    <button type="submit">Registruj se</button>
+    <label for="password">Nova lozinka:</label>
+    <input type="password" id="newPassword" name="newPassword">
+
+    <button type="submit">Izmeni podatke</button>
 </form>
 
 </body>

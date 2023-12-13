@@ -80,7 +80,7 @@
     <a href="{{ url_for('home') }}">Sistem Razmene Novca</a>
     {% if 'user' in session %}
         <a style="float: right;" href="{{ url_for('logout') }}">Odjava</a>
-        <a style="float: right;" href="#">Pregled Profila</a>
+        <a style="float: right;" href="{{ url_for('profileView') }}">Pregled Profila</a>
         <a style="float: right;" href="#">Pregled Racuna</a>
         <a style="float: right;" href="#">Transakcije</a>
         

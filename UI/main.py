@@ -70,5 +70,50 @@ def logout():
     session.pop('user', None)
     return render_template('index.html')
 
+@app.route("/profileView")
+def profileView():
+    return render_template("profil.html")
+
+@app.route("/update", methods=['POST', 'GET'])
+def update():
+    if request.method == 'GET':
+        return render_template('profil.html')
+    elif request.method == 'POST':
+        ime = request.form['firstName']
+        prezime = request.form['lastName']
+        adresa = request.form['address']
+        grad = request.form['city']
+        drzava = request.form['country']
+        telefon = request.form['phoneNumber']
+        lozinka = request.form['password']
+        novaLozinka = request.form['newPassword']
+
+        stariEmail = session['user'].get('email')
+
+        if(request.form['email'] == stariEmail):
+            email = stariEmail
+        else:
+            email = request.form['email']
+
+        #Ako nije uneta lozinka u formi lozinka se ne menja
+        if(novaLozinka == ""):
+            novaLozinka = lozinka
+
+
+    headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+    data = {'firstName':ime, 'lastName':prezime, 'address': adresa, 'city': grad, 'country': drzava,
+            'phoneNumber' : telefon, 'email': email, 'password': lozinka, 'newPassword': novaLozinka,
+            'oldEmail' : stariEmail}
+    requ = requests.post("http://localhost:6000/updateUser", json = data, headers = headers)
+    response = requ.json()
+    statusCode = requ.status_code
+    respMessage = response['message']
+    
+    if statusCode == 200:
+        updatedUser = response['user']
+        session['user'] = updatedUser
+
+    return render_template('profil.html', message = respMessage)
+
 if __name__ == "__main__":
     app.run(port = 5000)
