@@ -1,6 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zeka:zeka@localhost:5432/testbaza'
@@ -79,6 +83,31 @@ class Cards(db.Model):
             'isVerified': self.isVerified,
         }
 
+def sendMail(subject, body, receiver):
+    senderEmail = 'sistemrazmene@outlook.com'
+    senderPassword = 'razmenanovca123'
+
+    message = MIMEMultipart()
+    message['From'] = senderEmail
+    message['To'] = receiver
+    message['Subject'] = subject
+
+    bodyStr = str(body)
+    message.attach(MIMEText(bodyStr,'plain'))
+
+    try:
+        server = smtplib.SMTP('smtp.office365.com', 587)
+        server.starttls()
+
+        server.login(senderEmail, senderPassword)
+        server.sendmail(senderEmail, receiver, message.as_string())
+
+        server.quit()
+        print("Email sent!")
+    except Exception as e:
+        print(f"Error in mail sending: {e}")
+
+
 #Trazi usera po emailu i vraca ga na UI
 #login, 
 @app.route('/returnUser', methods=['GET', 'POST'])
@@ -117,7 +146,14 @@ def registerUser():
                         recvEmail,recvPassword)
         db.session.add(newUser)
         db.session.commit()
-        #TODO Napraviti slanje mejla novom useru sa njegovim kredencijalima
+        
+        #slanje mejla novom useru sa njegovim kredencijalima
+        sendMail("Podaci za prijavu", 
+                 "Registracija na sistem razmene novca je uspesna! Vasi podaci za "
+                 +"prijavu su sledeci:\nEmail: " + newUser.email + "\nLozinka: " + newUser.password
+                 +"\n\nPreporucujemo promenu inicijalne lozinke nakon prve prijave!"
+                 ,newUser.email)
+
         return jsonify({'message': 'Novi korisnik uspesno napravljen!'}), 200
     else:
         return jsonify({'message': 'Email je vec u upotrebi!'}), 400
