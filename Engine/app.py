@@ -1,11 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+import requests
 
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
+
+EXCHANGE_RATE_API = "https://v6.exchangerate-api.com/v6/84da0ca6eca0cde00ef3f0ac/latest/"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zeka:zeka@localhost:5432/testbaza'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -64,15 +67,17 @@ class Cards(db.Model):
     holderLastName = db.Column(db.String(30))
     securityCode = db.Column(db.String(3))
     balance = db.Column(db.Double)
+    currency = db.Column(db.String(3))
     isVerified = db.Column(db.Boolean)
 
-    def __init__(self, number, holderId, holderFirstName, holderLastName, securityCode, balance, isVerified):
+    def __init__(self, number, holderId, holderFirstName, holderLastName, securityCode, balance, currency, isVerified):
         self.number = number
         self.holderId = holderId
         self.holderFirstName = holderFirstName
         self.holderLastName = holderLastName
         self.securityCode = securityCode
         self.balance = balance
+        self.currency = currency
         self.isVerified = isVerified
 
     def to_dict(self):
@@ -84,6 +89,7 @@ class Cards(db.Model):
             'holderLastName' : self.holderLastName,
             'securityCode' : self.securityCode,
             'balance' : self.balance,
+            'currency' : self.currency,
             'isVerified': self.isVerified,
         }
 
@@ -208,6 +214,7 @@ def addCard():
     recvHolderLastName =  data['holderLastName']
     recvSecurityCode = data['securityCode']
     recvBalance = data['balance']
+    recvCurrency = data['currency']
 
     checkCard = Cards.query.filter_by(number = recvNumber).first()
     checkUser = Users.query.filter_by(id = recvHolderId).first()
@@ -215,7 +222,7 @@ def addCard():
     if checkUser is not None:
         if checkUser.firstName == recvHolderFirstName and checkUser.lastName == recvHolderLastName:
             if checkCard is None:
-                newCard = Cards(recvNumber,recvHolderId,recvHolderFirstName,recvHolderLastName,recvSecurityCode,recvBalance, False)
+                newCard = Cards(recvNumber,recvHolderId,recvHolderFirstName,recvHolderLastName,recvSecurityCode,recvBalance, recvCurrency, False)
                 db.session.add(newCard)
                 db.session.commit()
                 return jsonify({'message':'Kartica poslata na verifikaciju!'}), 200
@@ -250,6 +257,67 @@ def verifyCard():
             return jsonify({'message':'Greska, korisnik nije pronadjen i ne moze se verifikovati'}), 400
     else:
         return jsonify({'message':'Greska, kartica nije pronadjena u bazi'}), 400
+
+#Za prosledjeni id korisnika vraca sve njegove kartice na UI
+@app.route('/returnCardsByHolderId', methods=['POST'])
+def returnCardsByHolderId():
+    data = request.get_json()
+    recvHolderId = data['holderId']
+
+    cards = Cards.query.filter_by(holderId = recvHolderId).all()
+    cardList = [card.to_dict() for card in cards]
+
+    return jsonify({'cards':cardList}), 200
+
+#Dodaje novac na karticu sa prosledjenim IDjem u prosledjenoj valuti
+#Ukoliko je kartica u drugoj valuti od prosledjene, sredstva ce biti konvertovana i uplacena
+#Obratiti paznju na format za currency (EUR, RSD...)
+@app.route('/addBalance', methods=['POST'])
+def addBalance():
+    data = request.get_json()
+    recvCardId = data['cardId']
+    recvAmount = float(data['amount'])
+    recvCurrency = data['currency']
+
+    findCard = Cards.query.filter_by(id = recvCardId).first()
+
+    if findCard is not None:
+        if findCard.currency != recvCurrency:
+            response = requests.get(EXCHANGE_RATE_API + recvCurrency)
+            exc = response.json()
+            rate = exc['conversion_rates'][findCard.currency]
+            
+            newAmount = rate * recvAmount
+            findCard.balance += newAmount
+            db.session.commit()
+        else:
+            findCard.balance += recvAmount
+            db.session.commit()
+        return jsonify({'message' : 'Uspesna uplata!'}), 200
+    else:
+        return jsonify({'message' : 'Greska, kartica nije pronadjena!'}), 400
+
+#Prebacuje sredstva kartice u prosledjenu valutu
+@app.route('/convertCardCurrency', methods = ['POST'])
+def convertCardCurrency():
+    data = request.get_json()
+    recvCardId = data['cardId']
+    recvCurrency = data['currency']
+
+    findCard = Cards.query.filter_by(id=recvCardId).first()
+    
+    if findCard is not None:
+        response = requests.get(EXCHANGE_RATE_API + findCard.currency)
+        exc = response.json()
+        rate = exc['conversion_rates'][recvCurrency]
+
+        newBalance = rate * findCard.balance
+        findCard.balance = newBalance
+        findCard.currency = recvCurrency
+        db.session.commit()
+        return jsonify({'message':'Stanje racuna uspesno konvertovano u novu valutu!'}), 200
+    else:
+        return jsonify({'message' : 'Greska, kartica nije pronadjena!'}), 400
 
 if __name__ == '__main__':
     with app.app_context():
