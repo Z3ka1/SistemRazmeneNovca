@@ -24,9 +24,11 @@ class Users(db.Model):
     phoneNumber = db.Column(db.String(20))
     email = db.Column(db.String(30), unique = True)
     password = db.Column(db.String(30))
+    isVerified = db.Column(db.Boolean)
 
     #Posto je primary_key id ce biti automatski kreiran
-    def __init__(self, isAdmin, firstName, lastName, address, city, country, phoneNumber, email, password):
+    def __init__(self, isAdmin, firstName, lastName, address, city, country, phoneNumber, 
+                 email, password, isVerified):
         self.isAdmin = isAdmin
         self.firstName = firstName
         self.lastName = lastName
@@ -36,7 +38,8 @@ class Users(db.Model):
         self.phoneNumber = phoneNumber
         self.email =email
         self.password = password
-    
+        self.isVerified = isVerified
+
     #Stavljamo ceo objekat u recnik kako bi bio Serializable za jsonify()
     def to_dict(self):
         return {
@@ -49,7 +52,8 @@ class Users(db.Model):
             'country' : self.country,
             'phoneNumber' : self.phoneNumber,
             'email' : self.email,
-            'password' : self.password
+            'password' : self.password,
+            'isVerified' : self.isVerified
         }
 
 class Cards(db.Model):
@@ -143,7 +147,7 @@ def registerUser():
     checkUser = Users.query.filter_by(email = recvEmail).first()
     if checkUser is None:
         newUser = Users(False,recvFirstName,recvLastName,recvAddress, recvCity, recvCountry, recvPhoneNumber,
-                        recvEmail,recvPassword)
+                        recvEmail,recvPassword,False)
         db.session.add(newUser)
         db.session.commit()
         
@@ -222,6 +226,30 @@ def addCard():
     else:
         return jsonify({'message':'Greska, korisnik kartice nije pronadjen u bazi'}),400
 
+#za prosledjen id kartice i id korisnika kartice verifikuje karticu i korisnika(ukoliko vec nije verifikovan)
+@app.route('/verifyCard', methods=['POST'])
+def verifyCard():
+    data = request.get_json()
+    recvCardId = data['cardId']
+    recvHolderId = data['holderId']
+
+    findCard = Cards.query.filter_by(id = recvCardId).first()
+    findUser = Users.query.filter_by(id = recvHolderId).first()
+
+    if findCard is not None:
+        findCard.isVerified = True
+        db.session.commit()
+        if findUser is not None:
+            if findUser.isVerified == False:
+                findUser.isVerified = True
+                db.session.commit()
+                userDict = findUser.to_dict()
+                return jsonify({'user':userDict, 'message' : 'Kartica i korisnik uspesno verifikovani'}), 200
+            return jsonify({'message':'Kartica uspesno verifikovana'}), 200
+        else:
+            return jsonify({'message':'Greska, korisnik nije pronadjen i ne moze se verifikovati'}), 400
+    else:
+        return jsonify({'message':'Greska, kartica nije pronadjena u bazi'}), 400
 
 if __name__ == '__main__':
     with app.app_context():
@@ -229,7 +257,7 @@ if __name__ == '__main__':
         
         #Dodajemo admina ukoliko ne postoji
         if not Users.query.filter_by(email='admin@admin.com').first():
-            initAdmin = Users(True,'Admin','Adminovic','Adminova 1', 'NS', 'SRB', '0','admin@admin.com','admin')
+            initAdmin = Users(True,'Admin','Adminovic','Adminova 1', 'NS', 'SRB', '0','admin@admin.com','admin', True)
             db.session.add(initAdmin)
             db.session.commit()
 

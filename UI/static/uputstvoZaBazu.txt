@@ -35,10 +35,12 @@ postgresql://your_username:your_password@localhost:5432/your_database_name
 Korisne komande ('psql' shell):
 \dt -> Lista svih tabela u bazi
 \d ime_tabele  -> Prikaz strukture odredjene tabele
-SELECT * FROM ime_tabele -> Vraca sve redove tabele
-DELETE FROM ime_tabele WHERE uslov = nesto -> Brise red tabele za dati uslov
 \l -> Lista svih databaza 
 \c ime_baze -> Prebacivanje na drugu bazu
 
 \conninfo -> Informacije o trenutno odabranoj bazi
 \password ime_usera -> Promena sifre za prosledjenog usera
+
+SELECT * FROM ime_tabele -> Vraca sve redove tabele
+DELETE FROM ime_tabele WHERE uslov = nesto -> Brise red tabele za dati uslov
+DROP TABLE ime_tabele -> Brise celu tabelu iz baze
