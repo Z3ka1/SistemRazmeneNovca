@@ -1,0 +1,86 @@
+/* profile.css */
+
+.profile-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 2px solid #3498db;
+  border-radius: 10px;
+  background-color: #ecf0f1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-heading {
+  font-size: 28px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.detail-label {
+  font-weight: bold;
+  color: #3498db;
+  margin-bottom: 5px;
+}
+
+.user-details p {
+  margin: 0;
+  font-size: 18px;
+  color: #34495e;
+  line-height: 1.6;
+  display: flex;
+  justify-content: space-between; /* Postavi elemente jedan do drugog */
+  width: 100%; /* Postavi širinu na 100% kako bi bili u istom redu */
+}
+
+.edit-form {
+  margin-top: 20px;
+}
+
+.edit-form p {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #7f8c8d;
+}
+
+.edit-form input {
+  width: 48%; /* Postavi širinu input polja */
+  padding: 12px;
+  box-sizing: border-box;
+  font-size: 16px;
+  margin-bottom: 15px;
+  border: 1px solid #bdc3c7;
+  border-radius: 5px;
+}
+
+.edit-form input[name="firstName"] {
+  color: #2c3e50;
+  background-color: #ecf0f1;
+}
+
+.edit-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.edit-form button[type="button"] {
+  background-color: #bdc3c7;
+}
+
+.edit-form button:hover {
+  background-color: #2980b9;
+}

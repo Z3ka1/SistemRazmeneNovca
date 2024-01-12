@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import requests
+from flask_cors import CORS
 
 import smtplib
 from email.mime.text import MIMEText
@@ -8,9 +9,11 @@ from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 
+CORS(app)
+
 EXCHANGE_RATE_API = "https://v6.exchangerate-api.com/v6/84da0ca6eca0cde00ef3f0ac/latest/"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zeka:zeka@localhost:5432/testbaza'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:tatamata@localhost:5432/testbaza'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -329,4 +332,4 @@ if __name__ == '__main__':
             db.session.add(initAdmin)
             db.session.commit()
 
-    app.run(port = 6000)
+    app.run(port = 8000)
