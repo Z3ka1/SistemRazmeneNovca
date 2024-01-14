@@ -35,28 +35,28 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h2>Prijava korisnika</h2>
-      <form onSubmit={handleLogin}>
-        <label>
+    <div className='login-div'>
+      <h2 className='header-login'>Prijava korisnika</h2>
+      <form className='form-login' onSubmit={handleLogin}>
+        <label className='label-login'>
           Email:
-          <input
+          <input className='input-login'
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </label>
         <br />
-        <label>
-          Lozinka:
-          <input
+        <label className='label-login'> 
+          Lozinka: 
+          <input className='input-login'
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </label>
         <br />
-        <button type="submit">Prijavi se</button>
+        <button className='button-login' type="submit">Prijavi se</button>
         {loginError && <p style={{ color: 'red' }}>Pogrešno korisničko ime ili lozinka.</p>}
       </form>
     </div>

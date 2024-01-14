@@ -28,11 +28,11 @@ const Navbar = () => {
         {isAdmin && (
           <>
             <a href='/'>Pocetna</a>
+            <a href="/profile">Pregled profila</a>
             <a href="/add">Dodaj korisnika</a>
+            <a href="/verification">Verifikacija korisnickih naloga</a>
             <a href="/live">Live pracenje transakcije</a>
             <a href="/transactions">Transakcije</a>
-            <a href="/acount_overview">Pregled racuna</a>
-            <a href="/profile">Pregled profila</a>
           </>
         )}
         {isUser && (

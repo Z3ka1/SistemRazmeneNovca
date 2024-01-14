@@ -260,6 +260,13 @@ def verifyCard():
             return jsonify({'message':'Greska, korisnik nije pronadjen i ne moze se verifikovati'}), 400
     else:
         return jsonify({'message':'Greska, kartica nije pronadjena u bazi'}), 400
+    
+# Kontroler za vraćanje svih kartica
+@app.route('/returnAllCards', methods=['POST'])
+def returnAllCards():
+    cards = Cards.query.all()
+    cardList = [card.to_dict() for card in cards]
+    return jsonify({'cards': cardList}), 200
 
 #Za prosledjeni id korisnika vraca sve njegove kartice na UI
 @app.route('/returnCardsByHolderId', methods=['POST'])

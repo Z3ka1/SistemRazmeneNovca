@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AccountOverview = () => {
   const [cards, setCards] = useState([]);
   const [userId, setUserId] = useState(""); 
   const [showAddCardForm, setShowAddCardForm] = useState(false); 
 
+  const navigate = useNavigate();
+
+  const userFromStorage = localStorage.getItem('user');
+
   useEffect(() => {
-    const userFromStorage = localStorage.getItem('user');
     console.log(userFromStorage)
     const parsedUserFromStorage = JSON.parse(userFromStorage);
     if (parsedUserFromStorage) {
@@ -40,6 +44,12 @@ const AccountOverview = () => {
   const handleAddCardClick = () => {
     setShowAddCardForm(true);
   };
+
+  const handlePaymentClick = (selectedCard) => {
+    // Prosledi podatke o izabranoj kartici na putanju /add_to_card
+    navigate('/add_to_card', { state: { selectedCard } });
+  }
+  
 
   const handleAddCardSubmit = (data) => {
 
@@ -98,9 +108,12 @@ const AccountOverview = () => {
     }
   };
 
+  
+
   return (
   <div>
     {!showAddCardForm && (
+      
       <div>
         <h1>Pregled računa</h1>
 
@@ -124,6 +137,14 @@ const AccountOverview = () => {
                 <td>{card.balance}</td>
                 <td>{card.currency}</td>
                 <td>{card.isVerified ? 'Da' : 'Ne'}</td>
+                {card.isVerified && (
+                <td>
+                <button onClick={() => handlePaymentClick(card)}>
+                  Uplati na račun
+                </button>
+              </td>
+              
+                )}
               </tr>
             ))}
           </tbody>
@@ -151,12 +172,16 @@ const AccountOverview = () => {
           <label>Broj kartice:</label>
           <input type="text" name="number" required />
           <label>Security Code:</label>
-          <input type="text" name="securityCode" required />
+          <input type="number" maxLength="3" name="securityCode" required  onInput={(e) => (e.target.value = Math.max(0, parseInt(e.target.value)).toString().slice(0, 3))} />
           <label>Saldo:</label>
           <input type="text" name="balance" required />
           <label>Valuta:</label>
-          <input type="text" name="currency" required />
-
+          <select name="currency" required >
+            <option>EUR</option>
+            <option>BAM</option>
+            <option>RSD</option>      
+            <option>USD</option>
+          </select>
           <button type="submit">Dodaj karticu</button>
           <button type="button" onClick={() => setShowAddCardForm(false)}>
             Nazad
@@ -164,6 +189,7 @@ const AccountOverview = () => {
         </form>
       )}
     </div>
+    
   </div>
 );
 

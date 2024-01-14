@@ -1,0 +1,63 @@
+/* styles.css (ili bilo koji naziv koji koristite) */
+
+.ver-div {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 2px solid #57646d;
+    border-radius: 10px;
+    background-color: #ecf0f1;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    margin-top: 140px;
+  }
+  
+  .ver-header {
+    text-align: center;
+    color: #194563;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 0%;
+    margin-top: 0%;
+  }
+  
+  .ver-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .ver-thead {
+    background-color: #576f80;
+    color: #fff;
+    text-align: center;
+  }
+  
+  .ver-th, .ver-td {
+    padding: 9px;
+    text-align: left;
+    border-bottom: 1px solid #bdc3c7;
+  }
+  
+  .ver-th:last-child, .ver-td:last-child {
+    text-align: center;
+  }
+  
+  .ver-tbody tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .ver-button {
+    background-color: #43667e;
+    color: #fff;
+    padding: 8px 9px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .ver-button:hover {
+    background-color: #2980b9;
+  }
+  

@@ -1,3 +1,4 @@
+import "./profile.css"
 import React, { useState, useEffect } from 'react';
 
 const ProfileUpdate = () => {
@@ -37,6 +38,12 @@ const ProfileUpdate = () => {
   };
 
   const handleUpdateClick = () => {
+
+    if (!editUserData.password || !editUserData.newPassword) {
+      alert('Morate uneti obe lozinke. Ako ne zelite da menjate lozinku, potvrdite staru!');
+      return; // Prekida izvršavanje funkcije ako lozinke nisu popunjene
+    }
+
     const stariEmail = user.email;
 
     const data = {
@@ -83,10 +90,11 @@ const ProfileUpdate = () => {
   return (
     
     <div className='profile-update-container'>
-      <h1 className='profile-update-heading'>Izmena profila</h1>
+      
       {
         !editMode && (
       <div className='user-details'>
+        <h1 className='profile-update-heading'>Pregled profila</h1>
         <p><strong>Ime:</strong> {user.firstName}</p>
         <p><strong>Prezime:</strong> {user.lastName}</p>
         <p><strong>Adresa:</strong> {user.address}</p>
@@ -95,12 +103,14 @@ const ProfileUpdate = () => {
         <p><strong>Broj telefona:</strong> {user.phoneNumber}</p>
         <p><strong>Email:</strong> {user.email}</p>
         <button onClick={handleEditClick}>IZMENI</button>
-        {message && <p style={{color:'red'}}>{message}</p>}
+        {message && <p style={{color:'green'}}>{message}</p>}
       </div>
 )}
       {editMode && (
+        
        <form className='update-form'>
         <table>
+        <h1 className='profile-update-heading'>Izmena profila</h1>
           <tbody>
             { !user.isVerified && (
               <>
@@ -171,8 +181,9 @@ const ProfileUpdate = () => {
               /></td>
             </tr>
             <tr>
-              <td><label>Lozinka:</label></td>
+              <td><label>Trenutna lozinka:</label></td>
               <td><input
+                required
                 type='password'
                 name='password'
                 value={editUserData.password || ''}
@@ -182,17 +193,20 @@ const ProfileUpdate = () => {
             <tr>
               <td><label>Nova lozinka:</label></td>
               <td><input
+                required
                 type='password'
                 name='newPassword'
                 value={editUserData.newPassword || ''}
                 onChange={handleInputChange}
               /></td>
             </tr>
+
           </tbody>
         </table>
-
-  <button type='button' onClick={handleCancelClick}>ODUSTANI</button>
+  <p>
+  <button type='button' onClick={handleCancelClick}>NAZAD</button>
   <button type='button' onClick={handleUpdateClick}>IZMENI</button>
+  </p>
 </form>
 
       )}

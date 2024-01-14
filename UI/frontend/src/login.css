@@ -58,4 +58,69 @@ body {
     color: red;
     text-align: center;
   }
-  
+
+/* login.css */
+
+.login-div {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 30px;
+  border: 2px solid #687a86;
+  border-radius: 10px;
+  background-color: #ecf0f1;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  border-radius: 10%;
+  background-color: #e0e5eb;
+}
+
+.header-login {
+  text-align: center;
+  color: #345161;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.form-login {
+  margin-top: 20px;
+  width: 350px;
+}
+
+.label-login {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: bold;
+}
+
+.input-login {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #687a86;
+  border-radius: 4px;
+}
+
+.button-login {
+  background-color: #506574;
+  color: #fff;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  border-radius: 10%;
+}
+
+.button-login:hover {
+  background-color: #2980b9;
+  border-radius: 20%;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+  text-align: center;
+  font-weight: bold;
+}

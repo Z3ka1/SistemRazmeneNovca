@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react'
+import { useState } from 'react';
+import './addUser.css'
 
 
 const AddUserPage = () => {
@@ -13,8 +15,8 @@ const AddUserPage = () => {
     password: ''
   });
 
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [message, setMessage] = useState('');
+  //const [successMessage, setSuccessMessage] = useState('');
 
 
   const handleSubmit = (event) => {
@@ -27,21 +29,15 @@ const AddUserPage = () => {
       },
       body: JSON.stringify(userData),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.message) {
-          // Uspješno dodavanje korisnika
-          setErrorMessage('');
-          setSuccessMessage('Uspesno ste dodali korisnika.');
-        } else {
-          // Neuspješno dodavanje korisnika
-          setErrorMessage(data.message);
-        }
-      })
-      .catch((error) => {
-        console.error('Error adding user:', error);
-        setErrorMessage('Došlo je do greške prilikom slanja zahtjeva.');
-      });
+    .then((response) => {
+      if (!response.ok) {
+        setMessage('Neuspješno dodavanje korisnika');
+      }
+      setMessage('Korusnik je uspesno dodat')
+      return response.json();
+     
+    })
+   
   };
   
   const handleChange = (event) => {
@@ -50,22 +46,22 @@ const AddUserPage = () => {
   };
 
   return (
-    <div>
-      <h2>Dodavanje novog korisnika</h2>
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-      <form onSubmit={handleSubmit}>
-        <input type="text" name="firstName" value={userData.firstName} onChange={handleChange} placeholder="Ime" />
-        <input type="text" name="lastName" value={userData.lastName} onChange={handleChange} placeholder="Prezime" />
-        <input type="text" name="address" value={userData.address} onChange={handleChange} placeholder="Adresa" />
-        <input type="text" name="city" value={userData.city} onChange={handleChange} placeholder="Grad" />
-        <input type="text" name="country" value={userData.country} onChange={handleChange} placeholder="Država" />
-        <input type="text" name="phoneNumber" value={userData.phoneNumber} onChange={handleChange} placeholder="Broj telefona" />
-        <input type="email" name="email" value={userData.email} onChange={handleChange} placeholder="Email" />
-        <input type="password" name="password" value={userData.password} onChange={handleChange} placeholder="Lozinka" />
+    <div className='add-div'>
+      <h2 className='add-header'>Dodavanje novog korisnika</h2>
+     
+      <form className='add-form' onSubmit={handleSubmit}>
+        <input className='add-input' type="text" name="firstName" value={userData.firstName} onChange={handleChange} placeholder="Ime" />
+        <input className='add-input' type="text" name="lastName" value={userData.lastName} onChange={handleChange} placeholder="Prezime" />
+        <input className='add-input' type="text" name="address" value={userData.address} onChange={handleChange} placeholder="Adresa" />
+        <input className='add-input' type="text" name="city" value={userData.city} onChange={handleChange} placeholder="Grad" />
+        <input className='add-input' type="text" name="country" value={userData.country} onChange={handleChange} placeholder="Država" />
+        <input className='add-input' type="text" name="phoneNumber" value={userData.phoneNumber} onChange={handleChange} placeholder="Broj telefona" />
+        <input className='add-input' type="email" name="email" value={userData.email} onChange={handleChange} placeholder="Email" />
+        <input className='add-input' type="password" name="password" value={userData.password} onChange={handleChange} placeholder="Lozinka" />
 
-        <button type="submit">Dodaj korisnika</button>
+        <button className='add-button' type="submit">Dodaj korisnika</button>
       </form>
-      {successMessage && <p style={{ color: 'green', align: 'center' }}><strong>{successMessage}</strong></p>}
+     <p>{message}</p>
     </div>
   );
 };
