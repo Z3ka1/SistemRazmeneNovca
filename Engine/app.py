@@ -15,8 +15,9 @@ app = Flask(__name__)
 CORS(app)
 
 EXCHANGE_RATE_API = "https://v6.exchangerate-api.com/v6/84da0ca6eca0cde00ef3f0ac/latest/"
+THREAD_WAIT_SECONDS = 20
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:tatamata@localhost:5432/testbaza'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zeka:zeka@localhost:5432/testbaza'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -146,7 +147,7 @@ def sendMail(subject, body, receiver):
         server.sendmail(senderEmail, receiver, message.as_string())
 
         server.quit()
-        print("Email sent!")
+        print("Email sent to: '" + receiver + "'!")
     except Exception as e:
         print(f"Error in mail sending: {e}")
 
@@ -368,7 +369,7 @@ class TransactionThread(Thread):
                 while transactionQueue:
                     transactionId = transactionQueue.pop(0)
                     processTransaction(transactionId)
-                time.sleep(20)
+                time.sleep(THREAD_WAIT_SECONDS)
 
 #za valutu uzima valutu kartice sa koje se salje novac
 @app.route('/newTransaction', methods = ['POST'])
@@ -389,6 +390,9 @@ def newTransaction():
     if recipientCard is None:
         return jsonify({'message':'Transakcija nije napravljena, kartica primaoca nije pronadjena!'}), 400
 
+    if not senderCard.isVerified:
+        return jsonify({'message':'Transakcija nije napravljena, kartica posiljaoca nije verifikovana!'})
+
     recipient = Users.query.filter_by(id = recipientCard.holderId).first()
     if recipient is None:
         return jsonify({'message':'Transakcija nije napravljena, vlasnik kartice nije pronadjen!'}), 400
@@ -402,9 +406,23 @@ def newTransaction():
     if recipient.lastName.upper() != recvRecipientLastName.upper():
         return jsonify({'message':'Transakcija nije napravljena, uneto ime ne pripada primaocu sredstava!'}), 400
 
-    #TODO NE RADI KADA SE KREIRA VISE TRANSAKCIJA U PERIODU OD JEDNE MINUTE ZA ISTOG POSILJAOCA
+    #NE RADI KADA SE KREIRA VISE TRANSAKCIJA U PERIODU OD JEDNE MINUTE ZA ISTOG POSILJAOCA
     #     PREBACITI U processTransaction - RACUN MOZE UCI U MINUS
-    if senderCard.balance < recvAmount:
+    # if senderCard.balance < recvAmount:
+    #     return jsonify({'message':'Transakcija nije napravljena, nemate dovoljno sredstava na racunu!'}), 400
+
+    #Prolazi kroz sve transakcije koje nisu izvrsene i proverava da li je ostalo dovnoljno novca na racunu
+    totalAmountInTransactions = 0.0
+    transactions = Transactions.query.all()
+    if transactions is not None:
+        for trans in transactions:
+            if trans.senderCardNumber == senderCard.number and trans.isDone == False:
+                response = requests.get(EXCHANGE_RATE_API + trans.currency)
+                exc = response.json()
+                rate = exc['conversion_rates'][senderCard.currency]
+                totalAmountInTransactions += rate * trans.amount
+    totalAmountInTransactions += recvAmount
+    if senderCard.balance < totalAmountInTransactions:
         return jsonify({'message':'Transakcija nije napravljena, nemate dovoljno sredstava na racunu!'}), 400
 
     newTransaction = Transactions(senderCard.number, recipientCard.number, recvAmount, senderCard.currency, False)
@@ -446,18 +464,7 @@ def processTransaction(transactionId):
                 +"'. Posiljalac " + recipient.firstName + " " + recipient.lastName
                 +".\n\nHvala sto koristite nase usluge!"
                 ,recipient.email)
-    print("Transakcija obavljena")
-
-# def transactionProcessor():
-#     try:
-#         while True:
-#             print(transactionQueue.empty())
-#             while not transactionQueue.empty():
-#                 transaction = transactionQueue.get()
-#                 processTransaction(transaction)
-#             time.sleep(20)
-#     except KeyboardInterrupt:
-#         print("KeyboardInterrupt: Stopping transactionProcessor().")
+    print("Transakcija ID:'" + str(transactionId) + "' obavljena")
         
 @app.route('/returnAllTransactions', methods=['POST'])
 def returnAllTransactions():
@@ -465,7 +472,6 @@ def returnAllTransactions():
     transactionsList = [transaction.to_dict() for transaction in transactions]
     return jsonify({'transactions': transactionsList}), 200
 
-#TODO Mozda pametno - Na pocetku izvrsavanja prebaciti sve ne izvrsene transakcije u queue
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
@@ -476,14 +482,16 @@ if __name__ == '__main__':
             db.session.add(initAdmin)
             db.session.commit()
 
-    # transactionProcess = Process(target = transactionProcessor)
-    # transactionProcess.start()
+        #Dodavanje svih ne izvrsenih transakcija u red za izvrsavanje
+        transactions = Transactions.query.all()
+        if transactions is not None:
+            for trans in transactions:
+                if not trans.isDone:
+                    transactionQueue.append(trans.id)
 
     transactionThread = TransactionThread()
     transactionThread.start()
 
-    app.run(port = 8000)
+    app.run(port = 6000)
     
     transactionThread.join()
-    # transactionProcess.terminate()
-    # transactionProcess.join()
