@@ -16,7 +16,7 @@ CORS(app)
 
 EXCHANGE_RATE_API = "https://v6.exchangerate-api.com/v6/84da0ca6eca0cde00ef3f0ac/latest/"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zeka:zeka@localhost:5432/testbaza'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:tatamata@localhost:5432/testbaza'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -197,7 +197,7 @@ def registerUser():
                  +"\n\nPreporucujemo promenu inicijalne lozinke nakon prve prijave!"
                  ,newUser.email)
 
-        return jsonify({'message': 'Novi korisnik uspesno napravljen!'}), 200
+        return jsonify({'message': 'Novi korisnik uspesno kreiran!'}), 200
     else:
         return jsonify({'message': 'Email je vec u upotrebi!'}), 400
     
@@ -433,19 +433,19 @@ def processTransaction(transactionId):
         transaction.isDone = True
         db.session.commit()
         
-        #TODO RESITI PROBLEM SA MAILOM / NAPRAVITI NOVI
-        # sendMail("Transakcija uspesna", 
-        #          "Vasa transakcija je uspesna! \nSa vaseg racuna '" + transaction.senderCardNumber
-        #          +"' prebacena su sredstva na racun: '" + transaction.recipientCardNumber 
-        #          +"' u iznosu od " + str(transaction.amount) + " " + transaction.currency.upper()
-        #          +".\n\nHvala sto koristite nase usluge!"
-        #          ,sender.email)
-        # sendMail("Pristigla transakcija", 
-        #          "Na vas racun '" + transaction.recipientCardNumber + "' prebacena su sredstva u vrednosti od "
-        #          + str(transaction.amount) + " " + transaction.currency.upper() + " sa racuna '" + transaction.senderCardNumber
-        #          +"'. Posiljalac " + recipient.firstName + " " + recipient.lastName
-        #          +".\n\nHvala sto koristite nase usluge!"
-        #          ,recipient.email)
+      
+        sendMail("Transakcija uspesna", 
+                "Vasa transakcija je uspesna! \nSa vaseg racuna '" + transaction.senderCardNumber
+                +"' prebacena su sredstva na racun: '" + transaction.recipientCardNumber 
+                +"' u iznosu od " + str(transaction.amount) + " " + transaction.currency.upper()
+                +".\n\nHvala sto koristite nase usluge!"
+                ,sender.email)
+        sendMail("Pristigla transakcija", 
+                "Na vas racun '" + transaction.recipientCardNumber + "' prebacena su sredstva u vrednosti od "
+                + str(transaction.amount) + " " + transaction.currency.upper() + " sa racuna '" + transaction.senderCardNumber
+                +"'. Posiljalac " + recipient.firstName + " " + recipient.lastName
+                +".\n\nHvala sto koristite nase usluge!"
+                ,recipient.email)
     print("Transakcija obavljena")
 
 # def transactionProcessor():
@@ -482,7 +482,7 @@ if __name__ == '__main__':
     transactionThread = TransactionThread()
     transactionThread.start()
 
-    app.run(port = 6000)
+    app.run(port = 8000)
     
     transactionThread.join()
     # transactionProcess.terminate()

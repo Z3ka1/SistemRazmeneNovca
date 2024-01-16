@@ -1,0 +1,59 @@
+/* transaction.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #c9cacc; /* Sivkasta boja pozadine */
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #ebf3f3; /* Bela pozadina tabele */
+    padding: 20px;
+    border-radius: 10px; /* Uokvirivanje */
+    box-shadow: 0 0 10px rgba(36, 34, 34, 0.1); /* Senka */
+}
+
+h2 {
+    color: #1b3c52; /* Tamno siva boja teksta */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+input {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc; /* Sivkasta boja granice unosa */
+    border-radius: 5px;
+}
+
+button {
+    background-color: #596a83; /* Zelena boja dugmeta */
+    color: #fff; /* Bela boja teksta na dugmetu */
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #3767a7; /* Tamnija zelena boja na hoveru */
+    border-radius: 20%;
+}
+
+.error {
+    color: #ff0000; /* Crvena boja teksta za greške */
+    font-weight: bold; /* Boldovanje teksta za naglašavanje */
+}
+
+.message {
+    color: #008000; /* Zelena boja teksta za potvrdu */
+    font-weight: bold;
+}

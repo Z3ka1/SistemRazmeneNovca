@@ -27,22 +27,18 @@ const Navbar = () => {
       <div className="links">
         {isAdmin && (
           <>
-            <a href='/'>Pocetna</a>
             <a href="/profile">Pregled profila</a>
             <a href="/add">Dodaj korisnika</a>
             <a href="/verification">Verifikacija korisnickih naloga</a>
             <a href="/live">Live pracenje transakcije</a>
-            <a href="/transactions">Transakcije</a>
           </>
         )}
         {isUser && (
           <>
-            <a href='/'>Pocetna</a>
             <a href='/profile'>Pregled profila</a>
             <a href='/account_overview'>Pregled racuna</a>
             <a href='/payment'>Uplata</a>
             <a href='/currency_conversion'>Konverzija valuta</a>
-            <a href='/transactions'>Transakcije</a>
           </>
         )}
         {user && <button onClick={handleLogout}>Odjava</button>}

@@ -1,0 +1,42 @@
+/* Stilizacija glavnog kontejnera */
+.tr-div {
+    margin: 20px;
+}
+
+/* Stilizacija naslova tabele */
+.tr-header {
+    color: #161616;
+    border-bottom: 2px solid #c5bbbb; /* Donja ivica za naslov */
+    padding-bottom: 3px; /* Razmak ispod naslova */
+    margin-bottom: 10px; /* Dodatni razmak ispod naslova */
+}
+
+/* Stilizacija same tabele */
+.tr-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: #ffffff; /* Bela pozadina tabele */
+    border: 1px solid #ddd; /* Uokvirivanje tabele */
+}
+
+/* Stilizacija zaglavlja tabele */
+.tr-thead {
+    background-color: #777777;
+}
+
+/* Stilizacija redova tabele */
+.tr-tr {
+    border: 1px solid #dddbdb; /* Uokvirivanje redova */
+}
+
+/* Stilizacija ćelija tabele */
+.tr-td {
+    padding: 8px;
+    text-align: left;
+}
+
+/* Dodatni stil za neparni red u tabeli */
+.tr-tr:nth-child(odd) {
+    background-color: #ebf3f3; /* Svetlo siva pozadina */
+}
