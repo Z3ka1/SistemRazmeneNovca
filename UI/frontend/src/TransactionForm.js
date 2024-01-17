@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import './transaction.css'
 
 const TransactionForm = () => {
@@ -12,6 +13,46 @@ const TransactionForm = () => {
     });
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+
+    //////////////////////////////////////
+
+    const [cards, setCards] = useState([]);
+    const [userId, setUserId] = useState(""); 
+  
+    const userFromStorage = localStorage.getItem('user');
+
+    useEffect(() => {
+      console.log(userFromStorage)
+      const parsedUserFromStorage = JSON.parse(userFromStorage);
+      if (parsedUserFromStorage) {
+        setUserId(parsedUserFromStorage.id); 
+      }
+    }, []);
+  
+    useEffect(() => {
+      //localStorage.setItem('user', JSON.stringify(responseData.user))
+  
+      if (userId) {
+        fetch('http://localhost:8000/returnVerifiedCardsByHolderId', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ holderId: userId }),
+        })
+          .then((response) => response.json())
+          .then((responseData) => {
+            console.log("Response Data:", responseData);
+            
+            setCards(responseData.cards);
+          })
+          .catch((error) => {
+            console.error("Fetch Error:", error);
+          });
+      }
+    }); 
+
+    /////////////////////////////////////
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -55,21 +96,24 @@ const TransactionForm = () => {
             });
         });
     };
-    
+
     return (
         <div className='container'>
             <h2 className="header">Nova Transakcija</h2>
             {error && <p className="error">{error}</p>}
             <p className="message">{message}</p>
             <form className="form" onSubmit={handleSubmit}>
-                <input
-                    type="text"
+            <select className='selection-cards'
                     name="senderCardNumber"
                     value={formData.senderCardNumber}
                     onChange={handleChange}
-                    placeholder="Broj kartice pošiljaoca"
-                />
-                <input
+                    placeholder="Broj kartice pošiljaoca"   
+                >
+            {cards.map((card) => (
+                   <option key={card.id}>{card.number} {card.currency}</option>
+            ))}
+            </select>
+                <input 
                     type="text"
                     name="recipientCardNumber"
                     value={formData.recipientCardNumber}

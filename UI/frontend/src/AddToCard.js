@@ -59,7 +59,7 @@ const AddBalanceForm = () => {
         <div className='div2'>
           <p className='p'>Broj kartice: {selectedCard.number}</p>
           <p className='p'>Security Code: {selectedCard.securityCode}</p>
-          <p className='p'>Saldo: {selectedCard.balance}</p>
+          <p className='p'>Saldo: {selectedCard.balance.toFixed(2)}</p>
           <p className='p'>Valuta: {selectedCard.currency}</p>
 
         
@@ -94,7 +94,7 @@ const AddBalanceForm = () => {
                 <option className='option'>HUF</option>
                 <option className='option'>INR</option>
                 <option className='option'>IDR</option>
-                <option className='option'>ILS</option>
+                <option className='option'>TRY</option>
                 <option className='option'>JMD</option>
                 <option className='option'>JPY</option>
                 <option className='option'>JOD</option>

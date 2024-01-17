@@ -17,9 +17,9 @@ CORS(app, supports_credentials=True, headers=['Content-Type', 'Authorization'])
 
 
 EXCHANGE_RATE_API = "https://v6.exchangerate-api.com/v6/84da0ca6eca0cde00ef3f0ac/latest/"
-THREAD_WAIT_SECONDS = 20
+THREAD_WAIT_SECONDS = 60
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zeka:zeka@localhost:5432/testbaza'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:tatamata@localhost:5432/testbaza'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -505,6 +505,6 @@ if __name__ == '__main__':
     transactionThread = TransactionThread()
     transactionThread.start()
 
-    app.run(port = 6000)
+    app.run(port = 8000)
     
     transactionThread.join()

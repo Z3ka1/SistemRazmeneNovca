@@ -126,7 +126,7 @@ const AccountOverview = () => {
               <th className='th'>Prezime vlasnika</th>
               <th className='th'>Saldo</th>
               <th className='th'>Valuta</th>
-              <th className='th'>Verifikovan</th>
+              <th className='th'colSpan={2}>Verifikovan</th>
             </tr>
           </thead>
           <tbody className='tbody'>
@@ -135,7 +135,7 @@ const AccountOverview = () => {
                 <td className='td'>{card.number}</td>
                 <td className='td'>{card.holderFirstName}</td>
                 <td className='td'>{card.holderLastName}</td>
-                <td className='td'>{card.balance}</td>
+                <td className='td'>{card.balance.toFixed(2)}</td>
                 <td className='td'>{card.currency}</td>
                 <td className='td'>{card.isVerified ? 'Da' : 'Ne'}</td>
                 {card.isVerified && (
@@ -170,11 +170,11 @@ const AccountOverview = () => {
           }}
         >
           <label className='label'>Broj kartice:</label>
-          <input className='input'  type="text" name="number" required />
+          <input className='input'  type="number" name="number" maxLength="16" required  onInput={(e) => (e.target.value = Math.max(0, parseInt(e.target.value)).toString().slice(0, 16))}  />
           <label className='label'>Security Code:</label>
           <input className='input' type="number" maxLength="3" name="securityCode" required  onInput={(e) => (e.target.value = Math.max(0, parseInt(e.target.value)).toString().slice(0, 3))} />
           <label className='label'>Saldo:</label>
-          <input className='input' type="text" name="balance" required />
+          <input className='input' type="number" name="balance" required />
           <label className='label'>Valuta:</label>
           <select className='selection' name="currency" required >
             <option className='option'>EUR</option>

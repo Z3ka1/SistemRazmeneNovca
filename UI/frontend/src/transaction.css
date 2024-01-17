@@ -57,3 +57,12 @@ button:hover {
     color: #008000; /* Zelena boja teksta za potvrdu */
     font-weight: bold;
 }
+
+.selection-cards{
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc; /* Sivkasta boja granice unosa */
+    border-radius: 5px;
+    width: 268px;
+}
+

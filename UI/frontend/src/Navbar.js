@@ -37,8 +37,8 @@ const Navbar = () => {
           <>
             <a href='/profile'>Pregled profila</a>
             <a href='/account_overview'>Pregled racuna</a>
-            <a href='/payment'>Nova transakcija</a>
             <a href='/currency_conversion'>Konverzija valuta</a>
+            <a href='/payment'>Nova transakcija</a>
           </>
         )}
         {user && <button onClick={handleLogout}>Odjava</button>}

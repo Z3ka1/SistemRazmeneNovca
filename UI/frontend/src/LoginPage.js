@@ -40,7 +40,7 @@ const LoginPage = () => {
       <form className='form-login' onSubmit={handleLogin}>
         <label className='label-login'>
           Email:
-          <input className='input-login'
+          <input 
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -50,7 +50,7 @@ const LoginPage = () => {
         <br />
         <label className='label-login'> 
           Lozinka: 
-          <input className='input-login'
+          <input 
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

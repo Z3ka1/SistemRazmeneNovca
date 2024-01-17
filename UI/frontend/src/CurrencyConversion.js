@@ -86,7 +86,7 @@ const CurrencyConversion = () => {
             <tr className='tr' key={card.id}>
               <td className='td'>{card.number}</td>
               <td className='td'>{card.holderFirstName} {card.holderLastName}</td>
-              <td className='td'>{card.balance}</td>
+              <td className='td'>{card.balance.toFixed(2)}</td>
               <td className='td'>{card.currency}</td>
               <td className='td'>
                 <select className='option' onChange={(e) => setSelectedCurrency(e.target.value)}>
