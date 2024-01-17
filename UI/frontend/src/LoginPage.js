@@ -44,6 +44,7 @@ const LoginPage = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </label>
         <br />
@@ -53,6 +54,7 @@ const LoginPage = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </label>
         <br />

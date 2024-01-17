@@ -110,7 +110,7 @@ const ProfileUpdate = () => {
         
        <form className='update-form'>
         <table>
-        <h1 className='profile-update-heading'>Izmena profila</h1>
+        <th colSpan={2}><h1 className='profile-update-heading'>Izmena profila</h1></th>
           <tbody>
             { !user.isVerified && (
               <>

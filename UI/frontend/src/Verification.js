@@ -61,8 +61,8 @@ const Verification = () => {
         <thead className='ver-thead'>
           <tr className='ver-tr'>
             <th className='ver-th'>Broj kartice</th>
-            <th>Ime vlasnika</th>
-            <th>Prezime vlasnika</th>
+            <th>Ime</th>
+            <th>Prezime</th>
             <th>Saldo</th>
             <th>Valuta</th>
             <th>Verifikovan</th>
@@ -79,7 +79,7 @@ const Verification = () => {
               <td>{card.currency}</td>
               <td>{card.isVerified ? 'Da' : 'Ne'}</td>
               <td>
-                <button className='ver-button' onClick={() => handleVerifyClick(card.id, card.holderId)}>
+                <button className={`ver-button ${card.isVerified ? 'verified' : ''}`} onClick={() => handleVerifyClick(card.id, card.holderId)}>
                   {card.isVerified ? 'Verifikovan' : 'Verifikuj'}
                 </button>
               </td>

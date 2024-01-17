@@ -60,4 +60,14 @@
   .ver-button:hover {
     background-color: #2980b9;
   }
+
+  .verified {
+    background-color: #569b58; /* Zelena boja */
+    color: #fff; /* Bela boja teksta */
+  }
+
+  .verified:hover {
+    background-color: #569b58; /* Zadržavanje zelene boje */
+    border-radius: 0px;
+  }
   

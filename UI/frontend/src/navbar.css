@@ -2,8 +2,8 @@
     display: flex;
     justify-content: space-around; /* Promijenjen justify-content za centriranje */
     align-items: center;
-    background-color: #333;
-    color: white;
+    background-color: #84a9ac;
+    color: rgb(3, 3, 3);
     padding: 20px;
     position: fixed;
     width: 100%;
@@ -21,7 +21,7 @@
   }
   
   .links a {
-    color: white;
+    color: rgb(12, 12, 12);
     text-decoration: none;
     border: 1px solid white;
     padding: 8px 12px;

@@ -2,7 +2,6 @@ import React from 'react';
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './LoginPage';
-import Home from './Home';
 import Navbar from './Navbar'
 import AddUserPage from './AddUserPage';
 import ProfileOverview from './ProfileOverview';

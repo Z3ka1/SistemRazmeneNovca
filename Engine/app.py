@@ -2,6 +2,9 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import requests
 from flask_cors import CORS
+from multiprocessing import Process, Queue, resource_tracker
+import time
+from threading import Thread
 
 import smtplib
 from email.mime.text import MIMEText
@@ -14,8 +17,9 @@ CORS(app, supports_credentials=True, headers=['Content-Type', 'Authorization'])
 
 
 EXCHANGE_RATE_API = "https://v6.exchangerate-api.com/v6/84da0ca6eca0cde00ef3f0ac/latest/"
+THREAD_WAIT_SECONDS = 20
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:tatamata@localhost:5432/testbaza'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zeka:zeka@localhost:5432/testbaza'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -98,6 +102,33 @@ class Cards(db.Model):
             'isVerified': self.isVerified,
         }
 
+#transactionQueue = Queue()
+
+class Transactions(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    senderCardNumber = db.Column(db.String(16))
+    recipientCardNumber = db.Column(db.String(16))
+    amount = db.Column(db.Double)
+    currency = db.Column(db.String(3))
+    isDone = db.Column(db.Boolean)
+
+    def __init__(self, senderCardNumber, recipientCardNumber, amount, currency, isDone):
+        self.senderCardNumber = senderCardNumber
+        self.recipientCardNumber = recipientCardNumber
+        self.amount = amount
+        self.currency = currency
+        self.isDone = isDone
+
+    def to_dict(self):
+        return {
+            'id' : self.id,
+            'senderCardNumber' : self.senderCardNumber,
+            'recipientCardNumber' : self.recipientCardNumber,
+            'amount' : self.amount,
+            'currency' : self.currency,
+            'isDone' : self.isDone
+        }
+
 def sendMail(subject, body, receiver):
     senderEmail = 'sistemrazmene@outlook.com'
     senderPassword = 'razmenanovca123'
@@ -118,7 +149,7 @@ def sendMail(subject, body, receiver):
         server.sendmail(senderEmail, receiver, message.as_string())
 
         server.quit()
-        print("Email sent!")
+        print("Email sent to: '" + receiver + "'!")
     except Exception as e:
         print(f"Error in mail sending: {e}")
 
@@ -169,7 +200,7 @@ def registerUser():
                  +"\n\nPreporucujemo promenu inicijalne lozinke nakon prve prijave!"
                  ,newUser.email)
 
-        return jsonify({'message': 'Novi korisnik uspesno napravljen!'}), 200
+        return jsonify({'message': 'Novi korisnik uspesno kreiran!'}), 200
     else:
         return jsonify({'message': 'Email je vec u upotrebi!'}), 400
     
@@ -342,6 +373,118 @@ def convertCardCurrency():
     else:
         return jsonify({'message' : 'Greska, kartica nije pronadjena!'}), 400
 
+transactionQueue = []
+class TransactionThread(Thread):
+    def run(self):
+        with app.app_context():
+            while True:
+                #print(len(transactionQueue))
+                while transactionQueue:
+                    transactionId = transactionQueue.pop(0)
+                    processTransaction(transactionId)
+                time.sleep(THREAD_WAIT_SECONDS)
+
+#za valutu uzima valutu kartice sa koje se salje novac
+@app.route('/newTransaction', methods = ['POST'])
+def newTransaction():
+    data = request.get_json()
+    recvSenderCardNumber = data['senderCardNumber']
+    recvRecipientCardNumber = data['recipientCardNumber']
+    recvAmount = float(data['amount'])
+    recvRecipientEmail = data['recipientEmail']
+    recvRecipientFirstName = data['recipientFirstName']
+    recvRecipientLastName = data['recipientLastName']
+
+    senderCard = Cards.query.filter_by(number = recvSenderCardNumber).first()
+    if senderCard is None:
+        return jsonify({'message':'Transakcija nije napravljena, kartica posiljaoca nije pronadjena!'}), 400
+
+    recipientCard = Cards.query.filter_by(number = recvRecipientCardNumber).first()
+    if recipientCard is None:
+        return jsonify({'message':'Transakcija nije napravljena, kartica primaoca nije pronadjena!'}), 400
+
+    if not senderCard.isVerified:
+        return jsonify({'message':'Transakcija nije napravljena, kartica posiljaoca nije verifikovana!'})
+
+    recipient = Users.query.filter_by(id = recipientCard.holderId).first()
+    if recipient is None:
+        return jsonify({'message':'Transakcija nije napravljena, vlasnik kartice nije pronadjen!'}), 400
+
+    if recipient.email != recvRecipientEmail:
+        return jsonify({'message':'Transakcija nije napravljena, uneta email adresa ne pripada primaocu sredstava!'}), 400
+
+    if recipient.firstName.upper() != recvRecipientFirstName.upper():
+        return jsonify({'message':'Transakcija nije napravljena, uneto ime ne pripada primaocu sredstava!'}), 400
+
+    if recipient.lastName.upper() != recvRecipientLastName.upper():
+        return jsonify({'message':'Transakcija nije napravljena, uneto ime ne pripada primaocu sredstava!'}), 400
+
+    #NE RADI KADA SE KREIRA VISE TRANSAKCIJA U PERIODU OD JEDNE MINUTE ZA ISTOG POSILJAOCA
+    #     PREBACITI U processTransaction - RACUN MOZE UCI U MINUS
+    # if senderCard.balance < recvAmount:
+    #     return jsonify({'message':'Transakcija nije napravljena, nemate dovoljno sredstava na racunu!'}), 400
+
+    #Prolazi kroz sve transakcije koje nisu izvrsene i proverava da li je ostalo dovnoljno novca na racunu
+    totalAmountInTransactions = 0.0
+    transactions = Transactions.query.all()
+    if transactions is not None:
+        for trans in transactions:
+            if trans.senderCardNumber == senderCard.number and trans.isDone == False:
+                response = requests.get(EXCHANGE_RATE_API + trans.currency)
+                exc = response.json()
+                rate = exc['conversion_rates'][senderCard.currency]
+                totalAmountInTransactions += rate * trans.amount
+    totalAmountInTransactions += recvAmount
+    if senderCard.balance < totalAmountInTransactions:
+        return jsonify({'message':'Transakcija nije napravljena, nemate dovoljno sredstava na racunu!'}), 400
+
+    newTransaction = Transactions(senderCard.number, recipientCard.number, recvAmount, senderCard.currency, False)
+    db.session.add(newTransaction)
+    db.session.commit()
+
+    #transactionQueue.put(newTransaction)
+    transactionQueue.append(newTransaction.id)
+    return jsonify({'message':'Transakcija napravljena i ceka na izvrsenje!'}), 200
+
+def processTransaction(transactionId):
+    transaction = Transactions.query.filter_by(id = transactionId).first()
+    senderCard = Cards.query.filter_by(number = transaction.senderCardNumber).first()
+    recipientCard = Cards.query.filter_by(number = transaction.recipientCardNumber).first()
+    
+    response = requests.get(EXCHANGE_RATE_API + senderCard.currency)
+    exc = response.json()
+    rate = exc['conversion_rates'][recipientCard.currency]
+    amountInSecondCurrency = rate * transaction.amount
+    
+    sender = Users.query.filter_by(id = senderCard.holderId).first()
+    recipient = Users.query.filter_by(id = recipientCard.holderId).first()
+    if senderCard is not None and recipientCard is not None and sender is not None and recipient is not None:
+        senderCard.balance -= transaction.amount
+        recipientCard.balance += amountInSecondCurrency
+        transaction.isDone = True
+        db.session.commit()
+        
+      
+        sendMail("Transakcija uspesna", 
+                "Vasa transakcija je uspesna! \nSa vaseg racuna '" + transaction.senderCardNumber
+                +"' prebacena su sredstva na racun: '" + transaction.recipientCardNumber 
+                +"' u iznosu od " + str(transaction.amount) + " " + transaction.currency.upper()
+                +".\n\nHvala sto koristite nase usluge!"
+                ,sender.email)
+        sendMail("Pristigla transakcija", 
+                "Na vas racun '" + transaction.recipientCardNumber + "' prebacena su sredstva u vrednosti od "
+                + str(transaction.amount) + " " + transaction.currency.upper() + " sa racuna '" + transaction.senderCardNumber
+                +"'. Posiljalac " + recipient.firstName + " " + recipient.lastName
+                +".\n\nHvala sto koristite nase usluge!"
+                ,recipient.email)
+    print("Transakcija ID:'" + str(transactionId) + "' obavljena")
+        
+@app.route('/returnAllTransactions', methods=['POST'])
+def returnAllTransactions():
+    transactions = Transactions.query.all()
+    transactionsList = [transaction.to_dict() for transaction in transactions]
+    return jsonify({'transactions': transactionsList}), 200
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
@@ -352,4 +495,16 @@ if __name__ == '__main__':
             db.session.add(initAdmin)
             db.session.commit()
 
-    app.run(port = 8000)
+        #Dodavanje svih ne izvrsenih transakcija u red za izvrsavanje
+        transactions = Transactions.query.all()
+        if transactions is not None:
+            for trans in transactions:
+                if not trans.isDone:
+                    transactionQueue.append(trans.id)
+
+    transactionThread = TransactionThread()
+    transactionThread.start()
+
+    app.run(port = 6000)
+    
+    transactionThread.join()
