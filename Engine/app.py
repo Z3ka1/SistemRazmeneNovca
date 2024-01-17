@@ -10,6 +10,8 @@ from email.mime.multipart import MIMEMultipart
 app = Flask(__name__)
 
 CORS(app)
+CORS(app, supports_credentials=True, headers=['Content-Type', 'Authorization'])
+
 
 EXCHANGE_RATE_API = "https://v6.exchangerate-api.com/v6/84da0ca6eca0cde00ef3f0ac/latest/"
 
@@ -275,6 +277,17 @@ def returnCardsByHolderId():
     recvHolderId = data['holderId']
 
     cards = Cards.query.filter_by(holderId = recvHolderId).all()
+    cardList = [card.to_dict() for card in cards]
+
+    return jsonify({'cards':cardList}), 200
+
+@app.route('/returnVerifiedCardsByHolderId', methods=['POST'])
+def returnVerifiedCardsByHolderId():
+    data = request.get_json()
+    recvHolderId = data['holderId']
+
+    cards = Cards.query.filter_by(holderId = recvHolderId, isVerified = True).all()
+
     cardList = [card.to_dict() for card in cards]
 
     return jsonify({'cards':cardList}), 200

@@ -40,7 +40,7 @@ const Navbar = () => {
             <a href='/'>Pocetna</a>
             <a href='/profile'>Pregled profila</a>
             <a href='/account_overview'>Pregled racuna</a>
-            <a href='/payment'>Uplata</a>
+            <a href='/payment'>Nova transakcija</a>
             <a href='/currency_conversion'>Konverzija valuta</a>
             <a href='/transactions'>Transakcije</a>
           </>

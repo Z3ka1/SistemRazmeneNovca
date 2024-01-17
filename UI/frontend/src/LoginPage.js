@@ -24,7 +24,7 @@ const LoginPage = () => {
           // Ako server vrati korisnika, sačuvaj podatke korisnika u lokalnom skladištu
           localStorage.setItem('user', JSON.stringify(data.user));
           console.log(data)
-          window.location.href = '/home';
+          window.location.href = '/profile';
         } else {
           setLoginError(true);
         }

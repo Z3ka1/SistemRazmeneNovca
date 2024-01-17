@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './accountoverview.css'
 
 const AccountOverview = () => {
   const [cards, setCards] = useState([]);
@@ -39,7 +40,7 @@ const AccountOverview = () => {
           console.error("Fetch Error:", error);
         });
     }
-  }, [userId]); 
+  }); 
 
   const handleAddCardClick = () => {
     setShowAddCardForm(true);
@@ -111,35 +112,35 @@ const AccountOverview = () => {
   
 
   return (
-  <div>
+  <div className='div1'>
     {!showAddCardForm && (
       
-      <div>
-        <h1>Pregled računa</h1>
+      <div className='div2'>
+        <h1 className='header'>Pregled računa</h1>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Broj kartice</th>
-              <th>Ime vlasnika</th>
-              <th>Prezime vlasnika</th>
-              <th>Saldo</th>
-              <th>Valuta</th>
-              <th>Verifikovan</th>
+        <table className='table'>
+          <thead className='thead'>
+            <tr className='tr'>
+              <th className='th'>Broj kartice</th>
+              <th className='th'>Ime vlasnika</th>
+              <th className='th'>Prezime vlasnika</th>
+              <th className='th'>Saldo</th>
+              <th className='th'>Valuta</th>
+              <th className='th'>Verifikovan</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className='tbody'>
             {cards.map((card) => (
-              <tr key={card.id}>
-                <td>{card.number}</td>
-                <td>{card.holderFirstName}</td>
-                <td>{card.holderLastName}</td>
-                <td>{card.balance}</td>
-                <td>{card.currency}</td>
-                <td>{card.isVerified ? 'Da' : 'Ne'}</td>
+              <tr className='tr' key={card.id}>
+                <td className='td'>{card.number}</td>
+                <td className='td'>{card.holderFirstName}</td>
+                <td className='td'>{card.holderLastName}</td>
+                <td className='td'>{card.balance}</td>
+                <td className='td'>{card.currency}</td>
+                <td className='td'>{card.isVerified ? 'Da' : 'Ne'}</td>
                 {card.isVerified && (
                 <td>
-                <button onClick={() => handlePaymentClick(card)}>
+                <button className='payment-button' onClick={() => handlePaymentClick(card)}>
                   Uplati na račun
                 </button>
               </td>
@@ -150,15 +151,14 @@ const AccountOverview = () => {
           </tbody>
         </table>
 
-        <button onClick={handleAddCardClick} style={{ float: 'right' }}>
+        <button className='add-button' onClick={handleAddCardClick} style={{ float: 'right' }}>
           Dodaj novu karticu
         </button>
       </div>
     )}
-
-    <div>
+    <div className='div3'>
       {showAddCardForm && (
-        <form
+        <form className='form'
           onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -169,26 +169,43 @@ const AccountOverview = () => {
             handleAddCardSubmit(data);
           }}
         >
-          <label>Broj kartice:</label>
-          <input type="text" name="number" required />
-          <label>Security Code:</label>
-          <input type="number" maxLength="3" name="securityCode" required  onInput={(e) => (e.target.value = Math.max(0, parseInt(e.target.value)).toString().slice(0, 3))} />
-          <label>Saldo:</label>
-          <input type="text" name="balance" required />
-          <label>Valuta:</label>
-          <select name="currency" required >
-            <option>EUR</option>
-            <option>BAM</option>
-            <option>RSD</option>      
-            <option>USD</option>
+          <label className='label'>Broj kartice:</label>
+          <input className='input'  type="text" name="number" required />
+          <label className='label'>Security Code:</label>
+          <input className='input' type="number" maxLength="3" name="securityCode" required  onInput={(e) => (e.target.value = Math.max(0, parseInt(e.target.value)).toString().slice(0, 3))} />
+          <label className='label'>Saldo:</label>
+          <input className='input' type="text" name="balance" required />
+          <label className='label'>Valuta:</label>
+          <select className='selection' name="currency" required >
+            <option className='option'>EUR</option>
+            <option className='option'>BAM</option>
+            <option className='option'>RSD</option>      
+            <option className='option'>USD</option>
+            <option className='option'>BGN</option>
+            <option className='option'>CAD</option>
+            <option className='option'>CNY</option>
+            <option className='option'>CZK</option>
+            <option className='option'>DKK</option>
+            <option className='option'>EGP</option>
+            <option className='option'>HNL</option>
+            <option className='option'>HUF</option>
+            <option className='option'>INR</option>
+            <option className='option'>TRY</option>
+            <option className='option'>ILS</option>
+            <option className='option'>JMD</option>
+            <option className='option'>JPY</option>
+            <option className='option'>JOD</option>
+            <option className='option'>LRD</option>
+            <option className='option'>MKD</option>
           </select>
-          <button type="submit">Dodaj karticu</button>
-          <button type="button" onClick={() => setShowAddCardForm(false)}>
+          <button className='add-card-button' type="submit">Dodaj karticu</button>
+          <button className='back-button' type="button" onClick={() => setShowAddCardForm(false)}>
             Nazad
           </button>
         </form>
       )}
     </div>
+  
     
   </div>
 );

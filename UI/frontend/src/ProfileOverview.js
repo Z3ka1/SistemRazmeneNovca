@@ -183,6 +183,7 @@ const ProfileUpdate = () => {
             <tr>
               <td><label>Trenutna lozinka:</label></td>
               <td><input
+                placeholder="Unesite trenutnu lozinku!"
                 required
                 type='password'
                 name='password'
@@ -193,6 +194,7 @@ const ProfileUpdate = () => {
             <tr>
               <td><label>Nova lozinka:</label></td>
               <td><input
+                placeholder="Potvrdite staru ili unesite novu lozinku!"
                 required
                 type='password'
                 name='newPassword'
